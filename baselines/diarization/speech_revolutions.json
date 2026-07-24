@@ -1,0 +1,50 @@
+{
+  "benchmark": "diarization",
+  "provider": "speech_revolutions",
+  "suite_version": "v1",
+  "summary": {
+    "overall_der": 0.300374,
+    "overall_der_ci95": [
+      0.262456,
+      0.34526
+    ],
+    "speaker_error": 0.166504,
+    "false_alarm": 0.105392,
+    "missed_speech": 0.028478,
+    "overall_cpwer": 0.453874,
+    "overall_cpwer_ci95": [
+      0.402646,
+      0.516776
+    ],
+    "subset_breakdown": {
+      "ami": {
+        "der": 0.269787,
+        "cpwer": 0.33467,
+        "n_files": 20
+      },
+      "dipco": {
+        "der": 0.401673,
+        "cpwer": 0.617834,
+        "n_files": 5
+      },
+      "notsofar": {
+        "der": 0.344435,
+        "cpwer": 0.669183,
+        "n_files": 20
+      }
+    },
+    "collar_s": 0.25,
+    "total_ref_s": 35102.79,
+    "n_files": 45
+  },
+  "regression_specs": {
+    "overall_der": [
+      "lower",
+      0.01
+    ],
+    "overall_cpwer": [
+      "lower",
+      0.01
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "benchmark": "entities",
+  "provider": "speech_revolutions",
+  "suite_version": "v1",
+  "summary": {
+    "entity_precision": 0.714464,
+    "entity_recall": 0.716149,
+    "entity_f1": 0.715305,
+    "entity_f1_ci95": [
+      0.7,
+      0.730071
+    ],
+    "missed_entity_rate": 0.283851,
+    "false_entity_rate": 0.285536,
+    "total_ref_entities": 14416,
+    "n_files": 44
+  },
+  "regression_specs": {
+    "entity_f1": [
+      "higher",
+      0.02
+    ],
+    "entity_recall": [
+      "higher",
+      0.02
+    ]
+  }
+}

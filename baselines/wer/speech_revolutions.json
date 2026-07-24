@@ -1,0 +1,45 @@
+{
+  "benchmark": "wer",
+  "provider": "speech_revolutions",
+  "suite_version": "v1",
+  "summary": {
+    "overall_wer": 0.118299,
+    "overall_wer_ci95": [
+      0.108441,
+      0.128751
+    ],
+    "overall_clean": 0.028818,
+    "overall_clean_ci95": [
+      0.010791,
+      0.057831
+    ],
+    "overall_other": 0.052632,
+    "overall_other_ci95": [
+      0.039925,
+      0.06756
+    ],
+    "overall_earnings21": 0.119128,
+    "overall_earnings21_ci95": [
+      0.108278,
+      0.129276
+    ],
+    "substitutions": 13652,
+    "deletions": 24358,
+    "insertions": 5085,
+    "n_files": 244
+  },
+  "regression_specs": {
+    "overall_wer": [
+      "lower",
+      0.005
+    ],
+    "overall_clean": [
+      "lower",
+      0.005
+    ],
+    "overall_other": [
+      "lower",
+      0.005
+    ]
+  }
+}

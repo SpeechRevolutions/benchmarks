@@ -1,0 +1,54 @@
+{
+  "benchmark": "language_switching",
+  "provider": "speech_revolutions",
+  "suite_version": "v1",
+  "summary": {
+    "overall_wer": 0.671594,
+    "overall_wer_ci95": [
+      0.622212,
+      0.723022
+    ],
+    "switch_boundary_wer": 0.86511,
+    "switch_detection_accuracy": null,
+    "average_switch_latency_ms": null,
+    "per_language_wer": {
+      "ar_eg": 0.793522,
+      "cmn_hans_cn": 1.977064,
+      "de_de": 0.407166,
+      "el_gr": 0.818182,
+      "en_us": 0.555556,
+      "es_419": 0.61944,
+      "fi_fi": 0.441176,
+      "fr_fr": 0.557447,
+      "he_il": 0.6375,
+      "hi_in": 0.899142,
+      "id_id": 0.598214,
+      "it_it": 0.525849,
+      "ja_jp": 1.513021,
+      "ko_kr": 0.779528,
+      "nb_no": 0.53876,
+      "nl_nl": 0.66443,
+      "pl_pl": 0.96679,
+      "pt_br": 0.370821,
+      "ro_ro": 1.083333,
+      "ru_ru": 0.642066,
+      "sv_se": 0.994083,
+      "th_th": 0.950158,
+      "tr_tr": 0.484293,
+      "ur_pk": 1.116129,
+      "vi_vn": 0.936782
+    },
+    "switch_metrics_supported": false,
+    "n_files": 60
+  },
+  "regression_specs": {
+    "overall_wer": [
+      "lower",
+      0.01
+    ],
+    "switch_boundary_wer": [
+      "lower",
+      0.02
+    ]
+  }
+}

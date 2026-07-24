@@ -1,0 +1,18 @@
+# Large audio store and download scratch — never commit.
+_data/
+
+# Generated reports (JSON/MD/CSV). Baselines and manifests ARE committed.
+reports/
+
+# Cached raw provider transcripts (external providers only; can be large).
+# Re-scoring reuses these so a scoring-script fix costs $0 to re-evaluate.
+# Commit selectively if you want fully key-free public reproducibility.
+_transcripts/
+
+# Python
+__pycache__/
+*.pyc
+
+# Editor / backup cruft
+*.bak
+.DS_Store

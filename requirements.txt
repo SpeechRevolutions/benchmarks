@@ -1,0 +1,23 @@
+# Public benchmark suite dependencies.
+# Install with: pip install -r requirements.txt
+
+# ── Core scoring ────────────────────────────────────────────────────────────
+jiwer==3.0.4          # WER / CER
+numpy>=1.24.0         # DER, timestamp percentiles, price stats, bootstrap CIs
+scipy>=1.10.0         # Hungarian speaker assignment (DER, cpWER)
+requests>=2.28.0      # provider HTTP
+speechrevolutions>=0.2.0  # official SDK, used by the speech_revolutions provider
+whisper_normalizer==0.0.9  # standard WER text normalization (English + Basic)
+
+# ── Entity benchmark ────────────────────────────────────────────────────────
+spacy>=3.7.0
+# also run once: python -m spacy download en_core_web_sm
+
+# ── Multilingual / language-switching dataset prep ──────────────────────────
+# (only needed to (re)generate manifests, not to score)
+datasets>=2.18.0      # Google FLEURS download
+soundfile>=0.12.0     # write FLEURS audio to WAV
+
+# ── External tools (not pip) ─────────────────────────────────────────────────
+# ffmpeg + ffprobe   — audio duration, transcoding, language-switch concatenation
+# git                — cloning the Earnings21 (revdotcom/speech-datasets) repo

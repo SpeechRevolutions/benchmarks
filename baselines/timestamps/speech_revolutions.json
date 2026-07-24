@@ -1,0 +1,34 @@
+{
+  "benchmark": "timestamps",
+  "provider": "speech_revolutions",
+  "suite_version": "v1",
+  "summary": {
+    "start_mae_ms": 282.04,
+    "start_mae_ms_ci95": [
+      272.87707,
+      290.770725
+    ],
+    "end_mae_ms": 312.35,
+    "end_mae_ms_ci95": [
+      303.395559,
+      320.612046
+    ],
+    "start_p90_ms": 400.0,
+    "end_p90_ms": 680.0,
+    "within_50ms": 0.5304,
+    "within_100ms": 0.7854,
+    "within_200ms": 0.8665,
+    "n_matched_words": 73233,
+    "n_files": 20
+  },
+  "regression_specs": {
+    "start_mae_ms": [
+      "lower",
+      10.0
+    ],
+    "end_mae_ms": [
+      "lower",
+      10.0
+    ]
+  }
+}

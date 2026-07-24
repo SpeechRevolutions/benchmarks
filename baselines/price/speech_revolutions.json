@@ -1,0 +1,27 @@
+{
+  "benchmark": "price",
+  "provider": "speech_revolutions",
+  "suite_version": "v1",
+  "summary": {
+    "rtf": 1.0205,
+    "hours_per_gpu_hour": 16.9513,
+    "hours_per_dollar": null,
+    "average_latency": 8.642,
+    "p95_latency": 10.171,
+    "p99_latency": 10.172,
+    "wall_clock_s": 10.23,
+    "total_audio_h": 0.0482,
+    "n_gpus": 1.0,
+    "n_files": 20
+  },
+  "regression_specs": {
+    "rtf": [
+      "lower",
+      0.05
+    ],
+    "p95_latency": [
+      "lower",
+      2.0
+    ]
+  }
+}
