@@ -54,6 +54,19 @@ def _finish_one(bench, results: dict, provider_name: str, formats: tuple[str, ..
                 capture: bool, check: bool) -> list[str]:
     """Given already-computed results, capture/compare and write reports."""
     regressions: list[str] = []
+
+    # A run that scored nothing must not be reported as a pass. Every metric comes
+    # back None, `compare` finds no metric to regress against, and the suite prints
+    # "all benchmarks within baseline tolerance" -- which reads as a clean result to
+    # anyone rerunning our published numbers, when in fact no audio was transcribed.
+    # The usual cause is skipping the dataset build, so say so rather than just failing.
+    if int(results.get("summary", {}).get("n_files", 0) or 0) == 0:
+        print(f"  ERROR: {bench.name} scored 0 files -- nothing was measured.\n"
+              f"         Build the datasets first:  python -m benchmarks.datasets.prepare_all\n"
+              f"         (audio lives in benchmarks/_data/, which is not committed)",
+              file=sys.stderr)
+        return [f"no data: {bench.name} scored 0 files"]
+
     if capture:
         path = bench.capture_baseline(results, provider_name)
         if path:

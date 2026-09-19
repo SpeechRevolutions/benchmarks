@@ -82,7 +82,9 @@ which provider produced it.
 ## Quick start
 
 ```bash
-cd (repo root)
+git clone https://github.com/SpeechRevolutions/benchmarks
+cd benchmarks
+
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm     # entity benchmark
 
@@ -96,10 +98,13 @@ python -m benchmarks.datasets.prepare_all
 #    python -m benchmarks.datasets.prepare_language_switching
 #    python -m benchmarks.datasets.prepare_longform
 
-# 2. Set your API key for the reference provider
+# 2. Set your API key for the reference provider.
+#    The provider talks to production (https://api.speechrevolutions.com)
+#    through the published `speechrevolutions` SDK from requirements.txt --
+#    no local stack, no docker, nothing to run yourself.
 export SPEECHREVOLUTIONS_API_KEY=stt_...
-#    (optional) point at a non-production deployment instead:
-#    export SR_API_URL=http://localhost:8001
+#    (optional) override the endpoint to test a different deployment:
+#    export SR_API_URL=https://...
 
 # 3. Run a benchmark (or all) against the reference provider
 python -m benchmarks.cli run wer
@@ -109,7 +114,8 @@ python -m benchmarks.cli run all
 python -m benchmarks.cli run all --capture-baseline
 ```
 
-Run from the parent directory of this repo (so `python -m benchmarks...` resolves the package).
+Every command above runs from the repository root -- the one containing this
+README. `benchmarks/` next to it is the package the `-m` flag resolves.
 
 ---
 
