@@ -11,9 +11,7 @@ from ..core.benchmark import Benchmark
 from .diarization import DiarizationBenchmark
 from .entities import EntityBenchmark
 from .language_switching import LanguageSwitchingBenchmark
-from .longform import LongformBenchmark
 from .multilingual import MultilingualBenchmark
-from .price import PriceBenchmark
 from .timestamps import TimestampBenchmark
 from .wer import WERBenchmark
 
@@ -24,8 +22,6 @@ _BENCHMARKS: dict[str, type[Benchmark]] = {
     "timestamps": TimestampBenchmark,
     "multilingual": MultilingualBenchmark,
     "language_switching": LanguageSwitchingBenchmark,
-    "longform": LongformBenchmark,
-    "price": PriceBenchmark,
 }
 
 

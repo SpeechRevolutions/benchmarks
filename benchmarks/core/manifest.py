@@ -10,7 +10,6 @@ Common fields by benchmark:
     diarization:         id, audio_path, speakers:[{speaker,start,end}], duration_s
     timestamps:          id, audio_path, words:[{word,start,end}], duration_s
     language_switching:  id, audio_path, duration_s, segments:[{language,start,end,transcript}]
-    longform:            id, audio_path, transcript, duration_s
 """
 
 from __future__ import annotations

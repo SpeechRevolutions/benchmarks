@@ -59,8 +59,6 @@ SUBSEEDS = {
     "timestamps": 4001,
     "multilingual": 5001,
     "language_switching": 6001,
-    "longform": 7001,
-    "price": 8001,
 }
 
 # ── Frozen benchmark sizes (see spec "Benchmark Size") ───────────────────────────
@@ -74,7 +72,6 @@ SIZES = {
     "diarization_notsofar": 20,   # meetings sampled from NOTSOFAR dev-set-1 (36 total)
     "diarization_dipco": 5,       # DiPCo eval sessions (S01,S03,S06,S07,S08)
     "language_switching_per_level": 20,   # generated recordings per difficulty
-    "longform": 15,            # 10-20 long recordings
 }
 
 # ── Multilingual language set (FLEURS codes) ─────────────────────────────────────

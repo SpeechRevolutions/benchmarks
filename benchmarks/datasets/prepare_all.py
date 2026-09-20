@@ -7,7 +7,7 @@ the FLEURS clip pool); AMI/Earnings21 before long-form (which reuses them).
 
 Usage:
     python -m benchmarks.datasets.prepare_all
-    python -m benchmarks.datasets.prepare_all --skip earnings21 longform
+    python -m benchmarks.datasets.prepare_all --skip earnings21
 """
 
 from __future__ import annotations
@@ -21,7 +21,6 @@ from . import (
     prepare_fleurs,
     prepare_language_switching,
     prepare_librispeech,
-    prepare_longform,
 )
 
 STEPS = [
@@ -30,7 +29,6 @@ STEPS = [
     ("earnings21", lambda: prepare_earnings21.prepare(_earnings21_repo())),
     ("fleurs", lambda: prepare_fleurs.prepare(_fleurs_langs())),
     ("language_switching", lambda: prepare_language_switching.prepare(_ls_levels())),
-    ("longform", lambda: prepare_longform.prepare(_earnings21_repo(), None)),
 ]
 
 
@@ -53,7 +51,7 @@ def _ls_levels():
 def main() -> None:
     ap = argparse.ArgumentParser(description="Prepare all benchmark datasets")
     ap.add_argument("--skip", nargs="*", default=[],
-                    help="step names to skip (e.g. earnings21 longform)")
+                    help="step names to skip (e.g. earnings21 fleurs)")
     ap.add_argument("--only", nargs="*", default=None,
                     help="run only these steps")
     args = ap.parse_args()

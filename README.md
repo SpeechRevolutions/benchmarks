@@ -15,7 +15,7 @@ This package is entirely self-contained under `(repo root)/`.
 |---|---|
 | **Reference provider** | `speech_revolutions` — our own system (the "Zephyr" system), accessed via the [official Python SDK](https://github.com/SpeechRevolutions/python-sdk) against the production API. |
 | **External providers** | 11 implemented: AssemblyAI, Deepgram, OpenAI, ElevenLabs, Gladia, Mistral (Voxtral), Soniox, Cohere, Grok (xAI), Qwen3-ASR, Azure Batch. Each needs its own API key (see matrix below). |
-| **Benchmarks** | All 8: WER, Entity Accuracy, Diarization, Timestamps, Multilingual, Language Switching, Long-form, Price/Performance. |
+| **Benchmarks** | All 6: WER, Entity Accuracy, Diarization, Timestamps, Multilingual, Language Switching. |
 
 ## Providers
 
@@ -61,7 +61,7 @@ normalize(raw)          -> Transcript      # the single provider-agnostic type
 ```
 
 `transcribe_batch()` drives the whole submit→poll→download→normalize lifecycle in
-parallel and records per-file timing (used by price/perf). Subclasses implement
+parallel and records per-file timing. Subclasses implement
 only the four primitives.
 
 **Benchmark** (`core/benchmark.py`) — one per metric, all sharing:
@@ -96,7 +96,6 @@ python -m benchmarks.datasets.prepare_all
 #    python -m benchmarks.datasets.prepare_earnings21
 #    python -m benchmarks.datasets.prepare_fleurs
 #    python -m benchmarks.datasets.prepare_language_switching
-#    python -m benchmarks.datasets.prepare_longform
 
 # 2. Set your API key for the reference provider.
 #    The provider talks to production (https://api.speechrevolutions.com)
@@ -129,8 +128,6 @@ README. `benchmarks/` next to it is the package the `-m` flag resolves.
 | 4 | **Timestamps** | AMI (word-level refs) | `start_mae_ms`, `end_mae_ms`, `*_p90_ms`, `within_50/100/200ms` |
 | 5 | **Multilingual** | FLEURS (14 langs) | `overall_multilingual_wer`, `language_breakdown` (CER for zh/ja) |
 | 6 | **Language Switching** | FLEURS (auto-generated) | `overall_wer`, `switch_boundary_wer`, `switch_detection_accuracy`*, `average_switch_latency_ms`*, `per_language_wer` |
-| 7 | **Long-form** | AMI, Earnings21, podcasts | `overall_wer`, `hallucination_rate`, `duplicate_rate`, `missing_audio_rate`, `drift_events` |
-| 8 | **Price/Performance** | LibriSpeech subset | `rtf`, `hours_per_gpu_hour`, `hours_per_dollar`, `average/p95/p99_latency` |
 
 \* Switch detection + latency require **per-word language labels** from the
 provider. Providers that don't emit them get those two fields reported as
@@ -173,7 +170,7 @@ benchmarks/
     manifest.py normalize.py alignment.py diarization.py metrics.py report.py
   benchmarks/
     wer.py entities.py diarization.py timestamps.py
-    multilingual.py language_switching.py longform.py price.py
+    multilingual.py language_switching.py
   datasets/
     prepare_*.py        — deterministic, seeded dataset builders
   manifests/<benchmark>/<name>.jsonl   — committed, frozen
@@ -210,11 +207,6 @@ comparable to third-party figures.
   identical collar/overlap/audio conditions. **cpWER** (concatenated,
   speaker-permutation-invariant WER, Hungarian assignment) is the joint
   ASR+diarization metric vendors report; it needs per-speaker reference text.
-- **Price/Performance is indicative, not benchmarked.** RTF/throughput/latency
-  swing widely with stack warmth, load, and poll granularity (observed rtf 0.57
-  vs 2.02 on identical inputs). Do not publish these without a controlled
-  protocol (warm-up, fixed concurrency, repeated runs, representative clip
-  lengths).
 - **Provider capability.** Text-only APIs (OpenAI GPT-4o Transcribe, Cohere)
   return no word timestamps or speakers; on the timestamp/diarization benchmarks
   they must be reported as **not supported**, never as a 100%-error score.
@@ -224,8 +216,7 @@ comparable to third-party figures.
   (e.g. cpWER) or a `normalize()` bug and re-running costs **$0** in API calls.
   **Exception: the local Zephyr model is never cached** (`cacheable=False`) — it
   is actively improved, so every run re-transcribes to reflect current local
-  code. Price/perf also bypasses the cache (it must call the API to measure
-  latency). Force fresh external transcription with `--refresh`.
+  code. Force fresh external transcription with `--refresh`.
 - **Datasets are public, permissively licensed, and frozen** (seeded selections;
   see `config.SIZES`). Datasets with licensing or reproducibility doubt
   (Meanwhile, Rev16, TEDLIUM-NC, the wiped CommonVoice HF mirror) are
