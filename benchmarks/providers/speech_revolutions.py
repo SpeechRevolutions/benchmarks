@@ -87,8 +87,25 @@ class SpeechRevolutionsProvider(Provider):
             custom_vocabulary=list(vocab) or None,
         )
         upload_job = self._client.create_upload_job(len(audio_data), options)
-        self._client.upload_audio(upload_job.upload_url, audio_data, job_id=upload_job.job_id)
-        self._client.complete_upload(upload_job.job_id)
+        # From here the job EXISTS server-side. If the upload or the completion call
+        # fails, the job is registered, will never complete and will never fail --
+        # and the platform sheds customer intake when a small number of those sit
+        # past their deadline. So a failure here must be turned into a terminal
+        # state before it is raised, or a bad benchmark run takes production down
+        # for everyone. Cancelling writes a failed_jobs row, which is exactly what
+        # the stranded-job query looks for.
+        try:
+            self._client.upload_audio(upload_job.upload_url, audio_data,
+                                      job_id=upload_job.job_id)
+            self._client.complete_upload(upload_job.job_id)
+        except BaseException:
+            try:
+                self._client.cancel_job(upload_job.job_id)
+            except Exception:
+                # Best effort: the original failure is the one worth reporting, and
+                # a job we could not cancel ages out of the breaker's cohort anyway.
+                pass
+            raise
         return Job(
             entry_id=entry_id or upload_job.job_id,
             provider=self.name,
@@ -131,6 +148,7 @@ class SpeechRevolutionsProvider(Provider):
                 end=_to_float(w.get("end")),
                 speaker=w.get("speaker"),
                 language=w.get("language"),
+                prob=_to_float(w.get("prob")),
             ))
 
         text = data.get("text") or " ".join(w.text for w in words)
