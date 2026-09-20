@@ -19,12 +19,14 @@ API keys are read from environment variables (see require_key()).
 from __future__ import annotations
 
 import os
+import time
 from pathlib import Path
 from typing import Any
 
 import requests
 
 from .base import Features, Job, JobStatus, Provider
+from .types import Transcript
 
 
 class MissingKeyError(RuntimeError):

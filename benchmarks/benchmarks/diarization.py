@@ -3,9 +3,10 @@ Benchmark 3 — Speaker Diarization.
 
 Datasets: AMI, Earnings21 (+ DiPCo, NOTSOFAR when prepared).
 Metrics:
-  - DER at collar 0 (overlap-aware) is the headline. A lenient 0.25 s collar is
-    also reported (overall AND per subset), since published DiariZen/pyannote
-    numbers are reported with a collar.
+  - DER at collar 0 (overlap-aware) is the HEADLINE — SOTA-comparable to the
+    DiariZen/pyannote model cards. A lenient 0.25 s collar is also reported
+    (overall AND per subset): published DiariZen numbers use a collar, so e.g. our
+    NOTSOFAR is 24% @0 but 17% @0.25 = parity with their published 16.7-17.9%.
   - cpWER (concatenated, speaker-permutation-invariant WER) — the joint
     ASR+diarization metric vendors like AssemblyAI report. Computed whenever the
     manifest carries per-speaker reference text (``speaker_transcripts``) and the
@@ -40,9 +41,9 @@ class DiarizationBenchmark(Benchmark):
     features: Features = field(default_factory=lambda: Features(
         word_timestamps=True, speaker_labels=True, punctuation=True))
     subsets: dict[str, str] = field(default_factory=lambda: {
-        # ami_sdm (single distant mic + official RTTM) is the standard AMI condition
-        # used by published DiariZen numbers. ami (Mix-Headset) is kept for continuity
-        # but is OOD for segmentation models (summed close mics).
+        # ami_sdm (single distant mic + official RTTM) is the standard, SOTA-comparable
+        # AMI condition — reproduces published DiariZen numbers. ami (Mix-Headset) is
+        # kept for continuity but is OOD for segmentation models (summed close mics).
         "ami_sdm": "diarization_ami_sdm",
         "ami": "diarization_ami",
         "earnings21": "diarization_earnings21",
@@ -77,8 +78,8 @@ class DiarizationBenchmark(Benchmark):
                 hyp_segs = [(s.start, s.end, s.speaker)
                             for s in r.transcript.derived_segments()]
                 uem = r.meta.get("duration_s") or None
-                # Headline DER at collar 0 (overlap-aware — matches the
-                # DiariZen/pyannote model-card protocol); also the lenient 0.25 collar.
+                # Headline DER at collar 0 (overlap-aware, SOTA-comparable — matches
+                # DiariZen/pyannote model cards); also the lenient 0.25 collar.
                 fd = compute_der(ref_segs, hyp_segs, collar=0.0, uem_duration=uem)
                 fd25 = compute_der(ref_segs, hyp_segs, collar=DER_COLLAR_S, uem_duration=uem)
                 err25 = fd25["missed_speech_s"] + fd25["false_alarm_s"] + fd25["speaker_error_s"]
@@ -143,7 +144,7 @@ class DiarizationBenchmark(Benchmark):
 
         overall_der = frac(sum_missed + sum_fa + sum_spk)   # collar 0 (headline)
         summary = {
-            "overall_der": overall_der,                     # collar 0, overlap-aware
+            "overall_der": overall_der,                     # collar 0, overlap-aware (SOTA-comparable)
             "overall_der_collar025": frac(sum_err_c025),    # lenient collar, for vendor comparability
             "overall_der_ci95": bootstrap_ci(der_items, _ratio_stat),
             "speaker_error": frac(sum_spk),

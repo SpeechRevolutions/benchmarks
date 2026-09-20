@@ -15,7 +15,7 @@ from typing import Any
 
 import requests
 
-from ._common import AsyncProvider, require_key, to_float
+from ._common import AsyncProvider, require_key
 from .base import Features, JobStatus
 from .types import Transcript, Word
 
@@ -97,4 +97,8 @@ class GladiaProvider(AsyncProvider):
                           if tr.get("languages") else None, raw=raw)
 
 
-_f = to_float
+def _f(v: Any) -> float | None:
+    try:
+        return float(v) if v is not None else None
+    except (TypeError, ValueError):
+        return None

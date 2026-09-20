@@ -5,14 +5,14 @@ Generate the Language Switching benchmark from public FLEURS clips.
 Proprietary benchmark, generated entirely automatically (no manual curation).
 Reuses the multilingual clip pool (run prepare_fleurs first), then concatenates
 clips from multiple languages with realistic 300-800 ms pauses to synthesize
-code-switching recordings at four difficulty levels.
+code-switching recordings at three difficulty levels.
 
 Everything is seeded (config.SUBSEEDS['language_switching']) so the generated
 benchmark is byte-for-byte reproducible given the same FLEURS pool.
 
 Writes:
-    manifests/language_switching/ls_{lenient,easy,medium,hard}.jsonl
-    audio under _data/language_switching/audio/
+    manifests/language_switching/ls_{easy,medium,hard}.jsonl
+    audio under data/benchmarks/language_switching/audio/
 
 Requires: ffmpeg, and a prepared multilingual pool.
 

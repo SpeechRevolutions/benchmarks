@@ -20,6 +20,9 @@ class Word:
     end: float | None = None     # seconds
     speaker: str | None = None   # provider-native speaker label (e.g. "A", "spk_0")
     language: str | None = None  # per-word language tag (for language-switch scoring)
+    #: Recogniser confidence for this word, 0-1, when the provider reports one.
+    #: None means "not reported" and must never be read as "confident".
+    prob: float | None = None
 
 
 @dataclass

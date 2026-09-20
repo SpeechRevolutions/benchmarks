@@ -19,7 +19,7 @@ from typing import Any
 
 import requests
 
-from ._common import AsyncProvider, public_audio_url, require_key, to_float
+from ._common import AsyncProvider, public_audio_url, require_key
 from .base import Features, JobStatus
 from .types import Transcript, Word
 
@@ -121,4 +121,7 @@ class AzureProvider(AsyncProvider):
 
 
 def _ticks(v: Any) -> float | None:
-    return to_float(v, TICKS_PER_SECOND)
+    try:
+        return float(v) / TICKS_PER_SECOND if v is not None else None
+    except (TypeError, ValueError):
+        return None

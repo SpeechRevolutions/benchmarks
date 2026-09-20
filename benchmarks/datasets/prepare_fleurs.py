@@ -2,8 +2,8 @@
 """
 Prepare Google FLEURS for the multilingual benchmark.
 
-For each language in config.MULTILINGUAL_LANGUAGES, downloads the FLEURS test
-split and freezes a deterministic, seeded sample of N clips
+For each of the ~25 languages in config.MULTILINGUAL_LANGUAGES, downloads the
+FLEURS test split and freezes a deterministic, seeded sample of N clips
 (config.SIZES['multilingual_per_language']). Each language contributes roughly
 equal audio, per the spec.
 

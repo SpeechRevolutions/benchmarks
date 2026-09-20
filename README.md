@@ -109,7 +109,8 @@ export SPEECHREVOLUTIONS_API_KEY=stt_...
 python -m benchmarks.cli run wer
 python -m benchmarks.cli run all
 
-# 4. Freeze a baseline after a known-good run
+# 4. Optional: freeze your own baseline after a run you trust, so later runs
+#    flag regressions against it. Nothing is shipped for you to compare to.
 python -m benchmarks.cli run all --capture-baseline
 ```
 
@@ -124,7 +125,7 @@ README. `benchmarks/` next to it is the package the `-m` flag resolves.
 |---|-----------|------------|------------------|
 | 1 | **WER** | LibriSpeech clean/other, Earnings21 | `overall_wer`, `overall_clean`, `overall_other`, `overall_earnings21`, S/D/I |
 | 2 | **Entity Accuracy** | Earnings21 (spaCy NER) | `entity_precision/recall/f1`, `missed_entity_rate`, `false_entity_rate` |
-| 3 | **Diarization** | AMI, Earnings21 | `overall_der`, `speaker_error`, `false_alarm`, `missed_speech` (collar 0.25 s) |
+| 3 | **Diarization** | AMI-SDM, AMI Mix-Headset, Earnings21, NotSoFar, DiPCo | `overall_der` (collar 0, overlap-aware), `overall_der_collar025`, `speaker_error`, `false_alarm`, `missed_speech`, `overall_cpwer`, per-subset breakdown |
 | 4 | **Timestamps** | AMI (word-level refs) | `start_mae_ms`, `end_mae_ms`, `*_p90_ms`, `within_50/100/200ms` |
 | 5 | **Multilingual** | FLEURS (14 langs) | `overall_multilingual_wer`, `language_breakdown` (CER for zh/ja) |
 | 6 | **Language Switching** | FLEURS (auto-generated) | `overall_wer`, `switch_boundary_wer`, `switch_detection_accuracy`*, `average_switch_latency_ms`*, `per_language_wer` |
@@ -132,7 +133,8 @@ README. `benchmarks/` next to it is the package the `-m` flag resolves.
 \* Switch detection + latency require **per-word language labels** from the
 provider. Providers that don't emit them get those two fields reported as
 `null` with `switch_metrics_supported: false` rather than fabricated. The
-scoring path activates automatically for any provider that does emit them.
+scoring path activates automatically for any provider that does emit them --
+including the reference provider, which does.
 
 ---
 
@@ -173,9 +175,10 @@ benchmarks/
     multilingual.py language_switching.py
   datasets/
     prepare_*.py        — deterministic, seeded dataset builders
+  core/punctuation.py — punctuation-aware scoring helpers
+  tests/              — unit tests for the scoring paths
   manifests/<benchmark>/<name>.jsonl   — committed, frozen
-  baselines/<benchmark>/<provider>.json — committed
-  reports/  _data/      — generated / large (gitignored)
+  reports/  _data/      — generated / local (gitignored)
 ```
 
 ---
@@ -201,10 +204,16 @@ comparable to third-party figures.
   long-form, matched words for timestamps, files for entities, languages for
   multilingual). **A difference smaller than the CI is not a claim you can
   defend** — report N and CI alongside every published number.
-- **Diarization.** DER uses a **0.25 s collar, overlap included**, on AMI
-  **Mix-Headset** (the single mixed file a user would upload — not the trivially
-  easy per-speaker IHM channels). Numbers are only comparable across systems at
-  identical collar/overlap/audio conditions. **cpWER** (concatenated,
+- **Diarization.** The headline `overall_der` is **collar 0, overlap-aware**,
+  which is the condition the DiariZen/pyannote model cards report, so it is
+  comparable to them directly. A lenient **0.25 s** collar is reported alongside
+  it as `overall_der_collar025`, overall and per subset, because some published
+  figures use one — quoting a collar-0.25 number against a collar-0 number is the
+  easiest way to look better than you are, in either direction. Both are always
+  emitted; neither is a default you have to infer. The primary AMI condition is
+  **AMI-SDM** (single distant mic, official RTTM); AMI **Mix-Headset** is kept for
+  continuity but is out-of-distribution for segmentation models. Numbers are only
+  comparable across systems at identical collar/overlap/audio conditions. **cpWER** (concatenated,
   speaker-permutation-invariant WER, Hungarian assignment) is the joint
   ASR+diarization metric vendors report; it needs per-speaker reference text.
 - **Provider capability.** Text-only APIs (OpenAI GPT-4o Transcribe, Cohere)
@@ -227,8 +236,17 @@ comparable to third-party figures.
 
 Every benchmark emits the same four, all derived from one results dict:
 **JSON** (`reports/<b>/<provider>.json`), **Markdown**, **CSV** (per-file), and a
-**console** summary. Regressions vs. the committed baseline make the CLI exit
-non-zero (skip with `--no-check`; refresh with `--capture-baseline`).
+**console** summary.
+
+**No baselines are shipped.** Baselines are a regression guard for whoever owns
+the numbers, and a frozen copy of our results is worth nothing to you: it dates
+the moment it is committed, and a stale one quietly contradicts the figures on
+our site. Capture your own with `--capture-baseline` after a run you trust, and
+subsequent runs will compare against it and exit non-zero on a regression. With
+no baseline present, a run simply reports what it measured.
+
+A run that scores **zero files** is always a failure, never a pass -- the suite
+refuses to report "within tolerance" for a run that transcribed nothing.
 
 ## Adding a provider
 

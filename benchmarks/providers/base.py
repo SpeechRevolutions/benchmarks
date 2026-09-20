@@ -111,9 +111,6 @@ class Provider:
     poll_timeout_s: float = 3600.0
     initial_wait_s: float = 0.0
     submission_workers: int = 8
-    # A job whose poll() raises this many times in a row is failed early with the
-    # last error, rather than silently retrying until poll_timeout_s.
-    poll_max_consecutive_failures: int = 5
 
     def _cache_salt(self) -> str:
         """Identity folded into the transcript cache key so a provider's cached
@@ -237,8 +234,6 @@ class Provider:
 
         pending = dict(jobs)
         finished: dict[str, tuple[JobStatus, float]] = {}
-        last_poll_error: dict[str, str] = {}
-        fail_streak: dict[str, int] = {}
         poll_start = time.monotonic()
 
         while pending and (time.monotonic() - poll_start) < self.poll_timeout_s:
@@ -246,18 +241,8 @@ class Provider:
             for eid, job in pending.items():
                 try:
                     status = self.poll(job)
-                except Exception as e:  # noqa: BLE001
-                    # One-off blips are retried; a job that keeps erroring is failed
-                    # early with the last error instead of hanging until timeout.
-                    last_poll_error[eid] = str(e)
-                    fail_streak[eid] = fail_streak.get(eid, 0) + 1
-                    if fail_streak[eid] >= self.poll_max_consecutive_failures:
-                        finished[eid] = (JobStatus.FAILED, time.monotonic() - job.submitted_at)
-                        done_ids.append(eid)
-                        if progress:
-                            print(f"  FAILED    {eid}: {e}")
+                except Exception:  # noqa: BLE001 - transient; retry next loop
                     continue
-                fail_streak.pop(eid, None)
                 if status in (JobStatus.COMPLETED, JobStatus.FAILED):
                     finished[eid] = (status, time.monotonic() - job.submitted_at)
                     done_ids.append(eid)
@@ -278,14 +263,11 @@ class Provider:
             status, total_lat = finished.get(eid, (JobStatus.FAILED, 0.0))
             duration = float(job.meta.get("duration_s", 0.0))
             if status != JobStatus.COMPLETED:
-                err = last_poll_error.get(eid)
                 results.append(TranscriptionResult(
                     entry_id=eid, transcript=None, status=status,
                     submit_latency_s=submit_latency.get(eid, 0.0),
                     total_latency_s=total_lat, audio_duration_s=duration,
-                    error=(f"job did not complete (last poll error: {err})" if err
-                           else "job did not complete"),
-                    meta=job.meta,
+                    error="job did not complete", meta=job.meta,
                 ))
                 continue
             try:

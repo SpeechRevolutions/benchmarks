@@ -1,4 +1,4 @@
-# Multilingual FLEURS | 25 languages x 10 | frozen v1 | seed=20265602
+# Multilingual FLEURS | 14 languages x 10 | frozen v1 | seed=20265602
 {"id": "fleurs-en_us-00173", "audio_path": "multilingual/audio/en_us/en_us_00173.wav", "transcript": "The city is also the base to climb the Nyiragongo volcano along with some of the cheapest Mountain Gorilla tracking in Africa.", "language": "en_us", "duration_s": 10.38}
 {"id": "fleurs-en_us-00231", "audio_path": "multilingual/audio/en_us/en_us_00231.wav", "transcript": "There is no universal definition for which manufactured items are antiques. Some tax agencies define goods older than 100 years as antiques.", "language": "en_us", "duration_s": 11.8}
 {"id": "fleurs-en_us-00233", "audio_path": "multilingual/audio/en_us/en_us_00233.wav", "transcript": "The pyramid sound and light show is one of the most interesting things in the area for kids.", "language": "en_us", "duration_s": 7.02}

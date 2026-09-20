@@ -2,8 +2,8 @@
 Text normalization for WER/CER scoring.
 
 Uses the **Whisper standard normalizers** (the de-facto community standard, used
-by OpenAI/AssemblyAI/Whisper reporting) so results are comparable to published
-third-party figures and don't penalize formatting:
+by OpenAI/AssemblyAI/Whisper reporting) so our numbers are comparable to
+published third-party figures and don't penalize formatting:
 
   - English content  -> EnglishTextNormalizer: folds number words <-> digits,
     expands contractions, standardizes spelling, strips punctuation, lowercases.
@@ -143,14 +143,16 @@ def normalize_reference(text: str) -> str:
 # Filler/hesitation tokens that appear in VERBATIM references (Rev.com earnings21 and
 # long-form) but not in clean ASR output. Rev transcribes every "um"/"uh"/stammer; a
 # clean transcript omits them, so scoring clean output against a verbatim reference
-# counts them as deletions. Stripping them measures CONTENT accuracy, not disfluency
-# capture. Applied identically to ref and hyp, and published/reproducible.
+# counts them as deletions (evidence: 66% of our earnings21 deletions were fillers/
+# stammers/repeats). Stripping them measures CONTENT accuracy, not disfluency capture.
+# Applied identically to ref and hyp (fair), and published/reproducible.
 #
-# NOTE: discourse fillers ("you know"/"i mean"/"yeah") are deliberately NOT stripped.
-# They are genuine spoken content that ASR systems transcribe, so removing them from the
-# reference only would distort the comparison. The correct fix for verbatim-vs-clean
-# references is a clean (non-verbatim) dataset such as SPGISpeech, not ref-side
-# disfluency stripping.
+# NOTE: we deliberately do NOT extend this to discourse fillers ("you know"/"i mean"/
+# "yeah"). Measured on earnings21: stripping them from the verbatim reference (the scorer
+# strips ref only) HURT our WER (13.00 -> 13.27), because our own ASR emits those fillers
+# (~1.24% of tokens), so removing them from the ref turns our emitted copies into
+# insertions. The real fix for verbatim-vs-clean is a CLEAN (non-verbatim) reference such
+# as SPGISpeech — not aggressive ref-side disfluency stripping. See research-results.
 _FILLERS = {
     "um", "umm", "uh", "uhh", "uhm", "mm", "mmm", "hmm", "mhm", "mmhmm", "uhhuh",
     "er", "err", "ah", "ahh", "eh", "huh",

@@ -1,11 +1,10 @@
 """
 Provider registry.
 
-Maps a provider name to its adapter class. ``speech_revolutions`` is our own
-system (the "Zephyr" system in the comparison chart), accessed via the
-official Python SDK; the rest are the ten external systems being benchmarked
-against it. Each external adapter needs its own API key(s) via environment
-variables (see the README capability matrix).
+Maps a provider name to its adapter class. ``speech_revolutions`` is the local
+stack (the "Zephyr" system in the comparison chart); the rest are the ten
+external systems being benchmarked against it. Each external adapter needs its
+own API key(s) via environment variables (see the README capability matrix).
 """
 
 from __future__ import annotations
@@ -25,7 +24,7 @@ from .soniox import SonioxProvider
 from .speech_revolutions import SpeechRevolutionsProvider
 
 _PROVIDERS: dict[str, type[Provider]] = {
-    "speech_revolutions": SpeechRevolutionsProvider,  # our own system ("Zephyr")
+    "speech_revolutions": SpeechRevolutionsProvider,  # local ("Zephyr")
     "assemblyai": AssemblyAIProvider,
     "deepgram": DeepgramProvider,
     "openai": OpenAIProvider,

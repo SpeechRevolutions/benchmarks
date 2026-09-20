@@ -1,13 +1,12 @@
 """
 Benchmark 1 — Word Error Rate.
 
-Datasets: LibriSpeech test-clean, LibriSpeech test-other, Earnings21, SPGISpeech.
-Metric: WER via jiwer. Text is normalized with the Whisper standard normalizers
-(see core/normalize.py): lowercase, punctuation stripped, number words and digits
-folded together. Aggregation is word-count weighted.
+Datasets: LibriSpeech test-clean, LibriSpeech test-other, Earnings21.
+Metric: WER via jiwer. Normalization lowercases, removes punctuation, collapses
+whitespace, and keeps numbers (per spec). Aggregation is word-count weighted.
 
 Output: overall_wer, overall_clean, overall_other, overall_earnings21,
-overall_spgispeech, substitutions, deletions, insertions.
+substitutions, deletions, insertions.
 """
 
 from __future__ import annotations

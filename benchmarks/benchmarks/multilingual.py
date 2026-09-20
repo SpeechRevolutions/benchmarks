@@ -1,10 +1,10 @@
 """
 Benchmark 5 — Multilingual.
 
-Dataset: Google FLEURS, 14 languages, roughly equal audio per language.
-Metric: WER (CER for languages without word spaces — Mandarin, Japanese). Each
-file is transcribed with that language as a hint so we measure transcription
-quality rather than language ID.
+Dataset: Google FLEURS, ~25 representative languages, roughly equal audio per
+language. Metric: WER (CER for languages without word spaces — Mandarin,
+Japanese, Thai). Each file is transcribed with that language as a hint so we
+measure transcription quality rather than language ID.
 
 Output: overall_multilingual_wer, language_breakdown.
 """

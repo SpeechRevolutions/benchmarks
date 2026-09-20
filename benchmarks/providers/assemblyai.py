@@ -16,7 +16,7 @@ from typing import Any
 
 import requests
 
-from ._common import AsyncProvider, require_key, to_float
+from ._common import AsyncProvider, require_key
 from .base import Features, JobStatus
 from .types import Transcript, Word
 
@@ -91,4 +91,7 @@ class AssemblyAIProvider(AsyncProvider):
 
 
 def _ms(v: Any) -> float | None:
-    return to_float(v, 1000.0)
+    try:
+        return float(v) / 1000.0 if v is not None else None
+    except (TypeError, ValueError):
+        return None

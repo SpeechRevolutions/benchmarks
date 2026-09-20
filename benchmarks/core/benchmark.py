@@ -112,6 +112,24 @@ class Benchmark:
 
     # ── baseline / compare ───────────────────────────────────────────────────
 
+    def expected_file_count(self) -> int:
+        """How many files this benchmark's manifests declare, across all subsets.
+
+        0 when nothing can be read, which callers treat as "cannot verify" rather than
+        "expected nothing" — a missing manifest must not silently authorise a partial
+        baseline. Honours BENCH_MAX_FILES so a deliberately limited run is not misread as a
+        truncated one.
+        """
+        limit = os.environ.get("BENCH_MAX_FILES")
+        total = 0
+        for stem in self.subsets.values():
+            try:
+                items = items_for_provider(load_manifest(config.manifest_path(self.name, stem)))
+            except FileNotFoundError:
+                continue
+            total += min(len(items), int(limit)) if limit else len(items)
+        return total
+
     def capture_baseline(self, results: dict, provider_name: str) -> Path | None:
         """Freeze the current summary as the regression baseline.
 
@@ -127,6 +145,20 @@ class Benchmark:
             print(f"  [skip baseline] {self.name}/{provider_name}: run produced no "
                   f"usable data (n_files={summary.get('n_files', 0)}); baseline left unchanged.")
             return None
+
+        # A PARTIAL run is the dangerous case, not an empty one. Empty is obvious and already
+        # refused above; partial produces a clean-looking summary over whichever files
+        # survived, and freezing it makes a subset the definition of correct. This is not
+        # hypothetical: a 600 s job deadline dropped the long AMI meetings mid-job, and the
+        # diarization baseline was captured from 49 of 61 files -- 10 of 20 AMI, 3 of 5 DiPCo.
+        expected = self.expected_file_count()
+        actual = summary.get("n_files", 0)
+        if expected and actual < expected:
+            print(f"  [skip baseline] {self.name}/{provider_name}: scored {actual} of "
+                  f"{expected} manifest files. A baseline frozen from a partial run makes a "
+                  f"subset the reference; fix the failures or pass BENCH_ALLOW_PARTIAL_BASELINE=1.")
+            if os.environ.get("BENCH_ALLOW_PARTIAL_BASELINE") != "1":
+                return None
 
         path = config.baseline_path(self.name, provider_name)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -150,15 +182,37 @@ class Benchmark:
 
     def compare(self, results: dict, provider_name: str) -> list[str]:
         """Return regression strings (empty == pass / no baseline)."""
+        cur = results.get("summary", {})
+
+        # A run that measured NOTHING is a failure, and is checked BEFORE the baseline so it
+        # fires even for a provider that has none.
+        #
+        # Every metric comes back None when no file completes, and the loop below skips a None
+        # rather than failing on it -- so twenty files failing to submit scored as "all
+        # benchmarks within baseline tolerance". A suite that cannot tell a total outage from a
+        # clean pass cannot guard anything, and this is the one place whose job is that
+        # distinction. Observed: the entire timestamps suite reported PASS on n_files 0 after
+        # every submit returned HTTP 500.
+        if not cur.get("n_files"):
+            return [
+                f"n_files: {cur.get('n_files')!r} — the run produced no measurements; "
+                "treating as failure rather than as a pass"
+            ]
+
         baseline = self.load_baseline(provider_name)
         if not baseline:
             return []
         bl = baseline.get("summary", {})
-        cur = results.get("summary", {})
         regressions: list[str] = []
         for metric, (direction, tol) in self.regression_specs.items():
             base_v = bl.get(metric)
             cur_v = cur.get(metric)
+            if base_v is not None and cur_v is None:
+                # The baseline measured this and the run did not. Silently skipping it is how
+                # a metric that stops being produced looks like a metric that stopped
+                # regressing.
+                regressions.append(f"{metric}: missing from this run (baseline {base_v})")
+                continue
             if base_v is None or cur_v is None:
                 continue
             if not isinstance(base_v, (int, float)) or not isinstance(cur_v, (int, float)):

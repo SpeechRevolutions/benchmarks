@@ -15,7 +15,7 @@ from typing import Any
 
 import requests
 
-from ._common import SyncProvider, require_key, to_float
+from ._common import SyncProvider, require_key
 from .base import Features
 from .types import Transcript, Word
 
@@ -56,4 +56,8 @@ class GrokProvider(SyncProvider):
                           language=raw.get("language") or None, raw=raw)
 
 
-_f = to_float
+def _f(v: Any) -> float | None:
+    try:
+        return float(v) if v is not None else None
+    except (TypeError, ValueError):
+        return None

@@ -3,7 +3,7 @@ Benchmark 6 — Language Switching.
 
 Proprietary benchmark, generated entirely from public data (FLEURS clips
 concatenated with realistic pauses; see datasets/prepare_language_switching.py).
-Four difficulty levels: lenient (2 langs), easy (3), medium (6), hard (10).
+Three difficulty levels: easy (2 langs), medium (3), hard (5+).
 
 Manifest entry::
 
@@ -18,10 +18,11 @@ Metrics (per spec):
   average_switch_latency_ms— mean delay between true switch and detection*
   per_language_wer         — WER per language, attributing hyp words by timing
 
-* Requires per-word language labels from the provider. Providers that don't
-  attach a ``language`` to their words get these two metrics reported as
+* Requires per-word language labels from the provider. The local Speech
+  Revolutions model does not emit these, so these two metrics are reported as
   ``null`` with ``switch_metrics_supported: false`` rather than fabricated. The
-  scoring path activates automatically for any provider that does attach it.
+  scoring path activates automatically if a provider attaches ``language`` to
+  its words.
 """
 
 from __future__ import annotations
@@ -163,7 +164,7 @@ class LanguageSwitchingBenchmark(Benchmark):
 
         overall = corpus_word_error(all_ref, all_hyp)["wer"] if all_ref else None
         boundary = corpus_word_error(bnd_ref, bnd_hyp)["wer"] if any(bnd_ref) else None
-        # Per-language uses CER for languages without word spaces (zh/ja),
+        # Per-language uses CER for languages without word spaces (zh/ja/th),
         # matching the multilingual benchmark; word-level WER there is meaningless.
         per_language_wer = {}
         for lang in sorted(lang_ref):

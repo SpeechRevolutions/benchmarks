@@ -2,8 +2,8 @@
 JSONL manifest loading.
 
 A manifest is one JSON object per line (``#`` lines are comments). ``audio_path``
-is always relative to ``DATA_ROOT`` (the ``_data`` directory) so a committed
-manifest resolves on any machine that ran the prepare scripts.
+is always relative to ``DATA_ROOT`` ((repo root)/data/benchmarks) so a
+committed manifest resolves on any machine that ran the prepare scripts.
 
 Common fields by benchmark:
     WER / multilingual:  id, audio_path, transcript, duration_s, [language]

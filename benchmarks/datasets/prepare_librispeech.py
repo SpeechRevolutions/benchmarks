@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Prepare LibriSpeech subsets for the WER benchmark.
+Prepare LibriSpeech subsets for the WER benchmark (and the price subset).
 
 Downloads test-clean and test-other (CC BY 4.0, no registration), then freezes a
 deterministic, seeded sample of N clips per split. The selection is identical on
@@ -9,6 +9,7 @@ every machine because it is drawn from a fixed seed (config.SUBSEEDS).
 Writes:
     manifests/wer/wer_clean.jsonl   (config.SIZES['wer_clean'] clips)
     manifests/wer/wer_other.jsonl   (config.SIZES['wer_other'] clips)
+    manifests/price/price_all.jsonl (small fixed subset of clean, for timing)
     audio under data/benchmarks/wer/audio/
 
 Usage:
@@ -31,6 +32,7 @@ URLS = {
     "test-other": "https://www.openslr.org/resources/12/test-other.tar.gz",
 }
 SPLIT_TO_SUBSET = {"test-clean": "wer_clean", "test-other": "wer_other"}
+PRICE_SUBSET_SIZE = 20  # frozen subset of clean used by the price benchmark
 
 
 def _parse_trans(trans_file: Path) -> dict[str, str]:
@@ -73,6 +75,7 @@ def prepare(splits: list[str]) -> None:
     audio_out = config.audio_dir("wer")
     audio_out.mkdir(parents=True, exist_ok=True)
 
+    clean_entries: list[dict] = []
     for split in splits:
         subset = SPLIT_TO_SUBSET[split]
         all_utts = _collect_split(split, tmp_dir)
@@ -95,10 +98,13 @@ def prepare(splits: list[str]) -> None:
             header=f"WER {subset} | LibriSpeech {split} | frozen {config.SUITE_VERSION} "
                    f"| seed={config.MASTER_SEED + config.SUBSEEDS[subset]} | n={len(entries)}",
         )
+        if split == "test-clean":
+            clean_entries = entries
+
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Prepare the LibriSpeech WER subsets")
+    ap = argparse.ArgumentParser(description="Prepare LibriSpeech WER + price subsets")
     ap.add_argument("--split", nargs="+", default=["test-clean", "test-other"],
                     choices=["test-clean", "test-other"])
     prepare(ap.parse_args().split)

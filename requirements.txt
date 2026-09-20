@@ -17,6 +17,7 @@ spacy>=3.7.0
 # (only needed to (re)generate manifests, not to score)
 datasets>=2.18.0      # Google FLEURS download
 soundfile>=0.12.0     # write FLEURS audio to WAV
+pyarrow>=14.0.0       # read the SPGISpeech parquet shards
 
 # ── External tools (not pip) ─────────────────────────────────────────────────
 # ffmpeg + ffprobe   — audio duration, transcoding, language-switch concatenation
