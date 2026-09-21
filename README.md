@@ -125,7 +125,7 @@ README. `benchmarks/` next to it is the package the `-m` flag resolves.
 |---|-----------|------------|------------------|
 | 1 | **WER** | LibriSpeech clean/other, Earnings21 | `overall_wer`, `overall_clean`, `overall_other`, `overall_earnings21`, S/D/I |
 | 2 | **Entity Accuracy** | Earnings21 (spaCy NER) | `entity_precision/recall/f1`, `missed_entity_rate`, `false_entity_rate` |
-| 3 | **Diarization** | AMI-SDM, AMI Mix-Headset, Earnings21, NotSoFar, DiPCo | `overall_der` (collar 0, overlap-aware), `overall_der_collar025`, `speaker_error`, `false_alarm`, `missed_speech`, `overall_cpwer`, per-subset breakdown |
+| 3 | **Diarization** | AMI-SDM, AMI Mix-Headset, Earnings21, NotSoFar, DiPCo | `overall_der_collar025` (0.25 s collar, the figure published on our site), `overall_der` (strict, collar 0), `speaker_error`, `false_alarm`, `missed_speech`, `overall_cpwer`, per-subset breakdown |
 | 4 | **Timestamps** | AMI (word-level refs) | `start_mae_ms`, `end_mae_ms`, `*_p90_ms`, `within_50/100/200ms` |
 | 5 | **Multilingual** | FLEURS (14 langs) | `overall_multilingual_wer`, `language_breakdown` (CER for zh/ja) |
 | 6 | **Language Switching** | FLEURS (auto-generated) | `overall_wer`, `switch_boundary_wer`, `switch_detection_accuracy`*, `average_switch_latency_ms`*, `per_language_wer` |
@@ -204,13 +204,13 @@ comparable to third-party figures.
   long-form, matched words for timestamps, files for entities, languages for
   multilingual). **A difference smaller than the CI is not a claim you can
   defend** — report N and CI alongside every published number.
-- **Diarization.** The headline `overall_der` is **collar 0, overlap-aware**,
-  which is the condition the DiariZen/pyannote model cards report, so it is
-  comparable to them directly. A lenient **0.25 s** collar is reported alongside
-  it as `overall_der_collar025`, overall and per subset, because some published
-  figures use one — quoting a collar-0.25 number against a collar-0 number is the
-  easiest way to look better than you are, in either direction. Both are always
-  emitted; neither is a default you have to infer. The primary AMI condition is
+- **Diarization.** DER is overlap-aware. Our published figures use the
+  conventional **0.25 s** collar from the NIST speaker-diarization evaluations —
+  a short forgiveness window around each speaker change, where human reference
+  labels themselves disagree — reported as `overall_der_collar025`, overall and
+  per subset. The strict collar-0 figure is emitted alongside as `overall_der`.
+  Every provider is scored at the same collar, so the comparisons are like for
+  like; when you compare against a number published elsewhere, match its collar. The primary AMI condition is
   **AMI-SDM** (single distant mic, official RTTM); AMI **Mix-Headset** is kept for
   continuity but is out-of-distribution for segmentation models. Numbers are only
   comparable across systems at identical collar/overlap/audio conditions. **cpWER** (concatenated,
