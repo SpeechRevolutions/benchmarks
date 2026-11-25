@@ -3,7 +3,7 @@ Provider registry.
 
 Maps a provider name to its adapter class. ``speech_revolutions`` is our own
 system (the "Zephyr" system in the comparison chart), reached through the
-production API; the rest are the eleven external systems being benchmarked against it. Each external adapter needs its
+production API; the rest are the twelve external systems being benchmarked against it. Each external adapter needs its
 own API key(s) via environment variables (see the README capability matrix).
 """
 
@@ -19,6 +19,7 @@ from .gladia import GladiaProvider
 from .grok import GrokProvider
 from .mistral import MistralProvider
 from .openai import OpenAIProvider
+from .oruk import OrukProvider
 from .qwen import QwenProvider
 from .soniox import SonioxProvider
 from .speech_revolutions import SpeechRevolutionsProvider
@@ -34,6 +35,7 @@ _PROVIDERS: dict[str, type[Provider]] = {
     "soniox": SonioxProvider,
     "cohere": CohereProvider,
     "grok": GrokProvider,                # xAI
+    "oruk": OrukProvider,                # Oruk Fourier 2B (English text-only)
     "qwen": QwenProvider,                # Qwen3-ASR (needs URL-hosted audio)
     "azure": AzureProvider,              # Azure Batch (needs URL-hosted audio)
 }

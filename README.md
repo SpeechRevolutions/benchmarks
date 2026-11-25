@@ -14,7 +14,7 @@ This package is entirely self-contained under `(repo root)/`.
 | | |
 |---|---|
 | **Reference provider** | `speech_revolutions` — our own system (the "Zephyr" system), accessed via the [official Python SDK](https://github.com/SpeechRevolutions/python-sdk) against the production API. |
-| **External providers** | 11 implemented: AssemblyAI, Deepgram, OpenAI, ElevenLabs, Gladia, Mistral (Voxtral), Soniox, Cohere, Grok (xAI), Qwen3-ASR, Azure Batch. Each needs its own API key (see matrix below). |
+| **External providers** | 12 implemented: AssemblyAI, Deepgram, OpenAI, ElevenLabs, Gladia, Mistral (Voxtral), Soniox, Cohere, Grok (xAI), Oruk (Fourier 2B), Qwen3-ASR, Azure Batch. Each needs its own API key (see matrix below). |
 | **Benchmarks** | All 6: WER, Entity Accuracy, Diarization, Timestamps, Multilingual, Language Switching. |
 
 ## Providers
@@ -34,10 +34,11 @@ returns the same normalized `Transcript`, so scoring is identical.
 | `soniox` | stt-async-v5 | `SONIOX_API_KEY` | ✅ | ✅ | async; subword tokens merged to words |
 | `cohere` | cohere-transcribe-03-2026 | `CO_API_KEY` | ❌ | ❌ | **text only**; language required |
 | `grok` | xAI /v1/stt | `XAI_API_KEY` | ✅ | ✅ | sync |
+| `oruk` | oruk-fourier-2b | `ORUK_API_KEY` | ❌ | ❌ | **text only**; English only, $0.0080/min, 30 MiB / 60 min limit |
 | `qwen` | Qwen3-ASR filetrans | `DASHSCOPE_API_KEY` + `QWEN_AUDIO_BASE_URL` | ✅ | ❌ | **audio must be URL-hosted** |
 | `azure` | Azure Batch | `SPEECH_KEY` + `SPEECH_REGION` + `AZURE_AUDIO_BASE_URL` | ✅ | ✅ | **audio must be URL-hosted** |
 
-**Text-only providers** (OpenAI GPT-4o Transcribe, Cohere) can't produce word
+**Text-only providers** (OpenAI GPT-4o Transcribe, Cohere, Oruk Fourier 2B) can't produce word
 timestamps or speaker labels — the timestamp/diarization benchmarks will show no
 word data for them, which is an honest reflection of the API, not a harness bug.
 
